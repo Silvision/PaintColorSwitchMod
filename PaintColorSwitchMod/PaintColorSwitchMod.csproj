@@ -59,7 +59,9 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Netcode\PaintColorSwitchNetworkHandler.cs" />
         <Compile Include="Patches\PlayerControllerBPatch.cs" />
+        <Compile Include="Patches\SprayPaintItemPatch.cs" />
         <Compile Include="Plugin.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
