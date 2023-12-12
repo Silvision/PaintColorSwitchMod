@@ -15,10 +15,9 @@ namespace PaintColorSwitchMod.Patches
         
         private static GrabbableObject currentItem;
         private static SprayPaintItem sprayPaintItem = null;
-        private static int colorIndex;
 
-        static FieldInfo fieldInfo = AccessTools.Field(typeof(SprayPaintItem), "sprayCanMatsIndex");
-        // private static SprayPaintItem sprayPaintItem = null;
+        private static FieldInfo fieldInfo = AccessTools.Field(typeof(SprayPaintItem), "sprayCanMatsIndex");
+        private static int colorIndex;
         
         [HarmonyPatch("Update")]
         [HarmonyPostfix]
@@ -35,19 +34,18 @@ namespace PaintColorSwitchMod.Patches
                 if (sprayPaintItem == null) {
                     return; 
                 }
-
+                
                 colorIndex = (int)fieldInfo.GetValue(sprayPaintItem);
-                Debug.Log("color index is now: " + colorIndex);
                 
                 if ((Keyboard.current.eKey).wasPressedThisFrame) {
                     if ( colorIndex < sprayPaintItem.sprayCanMats.Length - 1) {
-                        fieldInfo.SetValue(sprayPaintItem, colorIndex+1);
-                        Debug.Log("color index is now: " + colorIndex);
-
+                        colorIndex++;
                     } else {
-                        fieldInfo.SetValue(sprayPaintItem, 0);
-                        Debug.Log("color index is now: " + colorIndex);
+                        colorIndex = 0;
                     }
+                    fieldInfo.SetValue(sprayPaintItem, colorIndex);
+                    sprayPaintItem.sprayParticle.GetComponent<ParticleSystemRenderer>().material = sprayPaintItem.particleMats[colorIndex];
+                    sprayPaintItem.sprayCanNeedsShakingParticle.GetComponent<ParticleSystemRenderer>().material = sprayPaintItem.particleMats[colorIndex];
                 }
                 
             }

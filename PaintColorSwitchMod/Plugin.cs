@@ -22,28 +22,28 @@ namespace PaintColorSwitchMod
         private readonly Harmony harmony = new Harmony(PLUGIN_GUID);
 
         // Taken from: [https://github.com/EvaisaDev/UnityNetcodeWeaver]
-        // private void NetCodeWeaver()
-        // {
-        //     var types = Assembly.GetExecutingAssembly().GetTypes();
-        //     foreach (var type in types)
-        //     {
-        //         var methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
-        //         foreach (var method in methods)
-        //         {
-        //             var attributes = method.GetCustomAttributes(typeof(RuntimeInitializeOnLoadMethodAttribute), false);
-        //             if (attributes.Length > 0)
-        //             {
-        //                 method.Invoke(null, null);
-        //             }
-        //         }
-        //     }
-        // }
+        private void NetCodeWeaver()
+        {
+            var types = Assembly.GetExecutingAssembly().GetTypes();
+            foreach (var type in types)
+            {
+                var methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+                foreach (var method in methods)
+                {
+                    var attributes = method.GetCustomAttributes(typeof(RuntimeInitializeOnLoadMethodAttribute), false);
+                    if (attributes.Length > 0)
+                    {
+                        method.Invoke(null, null);
+                    }
+                }
+            }
+        }
         
         private void Awake()
         {
             Logger.LogInfo($"Plugin {PLUGIN_GUID} is loaded!");
             
-            // NetCodeWeaver();
+            NetCodeWeaver();
             
             if (Instance == null)
             {
