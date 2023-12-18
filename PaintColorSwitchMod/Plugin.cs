@@ -4,7 +4,9 @@ using System.Reflection;
 using BepInEx;
 using HarmonyLib;
 using PaintColorSwitchMod.Patches;
+using Unity.Netcode;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace PaintColorSwitchMod
 {
@@ -17,12 +19,13 @@ namespace PaintColorSwitchMod
         private const string PLUGIN_VERSION = "1.0.0";
         
         public static PaintColorSwitchModBase Instance;
+        public static GameObject PaintColorSwitchNetworkHandlerPrefab;
 
         
         private readonly Harmony harmony = new Harmony(PLUGIN_GUID);
 
         // Taken from: [https://github.com/EvaisaDev/UnityNetcodeWeaver]
-        private void NetCodeWeaver()
+        private static void NetCodeWeaver()
         {
             var types = Assembly.GetExecutingAssembly().GetTypes();
             foreach (var type in types)
@@ -43,6 +46,10 @@ namespace PaintColorSwitchMod
         {
             Logger.LogInfo($"Plugin {PLUGIN_GUID} is loaded!");
             
+            // AssetBundle mainAssetBundle = AssetBundle.LoadFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream("PaintColorSwitchMod.Properties.Resources.asset"));
+            // PaintColorSwitchNetworkHandlerPrefab = mainAssetBundle.LoadAsset<GameObject>("PaintColorSwitchNetworkHandler");
+            // mainAssetBundle.Unload(false);
+            
             NetCodeWeaver();
             
             if (Instance == null)
@@ -50,8 +57,42 @@ namespace PaintColorSwitchMod
                 Instance = this;
             }
             
+            harmony.PatchAll();
             harmony.PatchAll(typeof(PaintColorSwitchModBase));
             harmony.PatchAll(typeof(PlayerControllerBPatch));
+            harmony.PatchAll(typeof(SprayPaintItemPatch));
+            // harmony.PatchAll(typeof(GameNetworkManagerPatch));
         }
+        
+        
+        
+    }
+    
+    [HarmonyPatch]
+    public class NetworkObjectManager
+    {
+        static GameObject networkPrefab;
+        
+        [HarmonyPostfix, HarmonyPatch(typeof(GameNetworkManager), "Start")]
+        public static void Init()
+        {
+            if (networkPrefab != null)
+                return;
+            
+            AssetBundle mainAssetBundle = AssetBundle.LoadFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream("PaintColorSwitchMod.Properties.Resources.asset"));
+            networkPrefab = mainAssetBundle.LoadAsset<GameObject>("PaintColorSwitchNetworkHandler");
+            mainAssetBundle.Unload(false);
+            networkPrefab.AddComponent<PaintColorSwitchNetworkHandler>();
+        
+            NetworkManager.Singleton.AddNetworkPrefab(networkPrefab);
+        }
+    
+        [HarmonyPostfix, HarmonyPatch(typeof(StartOfRound), "Awake")]
+        static void SpawnNetworkHandler() {
+            if (!NetworkManager.Singleton.IsHost && !NetworkManager.Singleton.IsServer) return;
+            var networkHandlerHost = Object.Instantiate(networkPrefab, Vector3.zero, Quaternion.identity);
+            networkHandlerHost.GetComponent<NetworkObject>().Spawn();
+        }
+    
     }
 }

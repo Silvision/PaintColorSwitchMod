@@ -15,9 +15,9 @@ namespace PaintColorSwitchMod.Patches
         
         private static GrabbableObject currentItem;
         private static SprayPaintItem sprayPaintItem = null;
-
-        private static FieldInfo fieldInfo = AccessTools.Field(typeof(SprayPaintItem), "sprayCanMatsIndex");
-        private static int colorIndex;
+        
+        // private static FieldInfo fieldInfo = AccessTools.Field(typeof(SprayPaintItem), "sprayCanMatsIndex");
+        // private static int colorIndex;
         
         [HarmonyPatch("Update")]
         [HarmonyPostfix]
@@ -35,20 +35,34 @@ namespace PaintColorSwitchMod.Patches
                     return; 
                 }
                 
-                colorIndex = (int)fieldInfo.GetValue(sprayPaintItem);
-                
-                if ((Keyboard.current.eKey).wasPressedThisFrame) {
-                    if ( colorIndex < sprayPaintItem.sprayCanMats.Length - 1) {
-                        colorIndex++;
+                if ((Keyboard.current.tKey).wasPressedThisFrame) {
+                    if (PaintColorSwitchNetworkHandler.Instance) {
+                        Debug.Log("EXISTS");
                     } else {
-                        colorIndex = 0;
+                        Debug.Log("DOESN'T EXISTS");
                     }
-                    fieldInfo.SetValue(sprayPaintItem, colorIndex);
-                    sprayPaintItem.sprayParticle.GetComponent<ParticleSystemRenderer>().material = sprayPaintItem.particleMats[colorIndex];
-                    sprayPaintItem.sprayCanNeedsShakingParticle.GetComponent<ParticleSystemRenderer>().material = sprayPaintItem.particleMats[colorIndex];
+                    PaintColorSwitchNetworkHandler.Instance.EventServerRPC();
+                    // colorIndex = (int)fieldInfo.GetValue(sprayPaintItem);
+                    //
+                    // Debug.Log("Value retrieved in PlayerControllerB: " + colorIndex);
+                    // if ( colorIndex < sprayPaintItem.sprayCanMats.Length - 1) {
+                    //     colorIndex++;
+                    // } else {
+                    //     colorIndex = 0;
+                    // }
+                    // Debug.Log("Color set from PlayerControllerB: " + colorIndex);
+                    // fieldInfo.SetValue(sprayPaintItem, colorIndex);
+                    // sprayPaintItem.sprayParticle.GetComponent<ParticleSystemRenderer>().material = sprayPaintItem.particleMats[colorIndex];
+                    // sprayPaintItem.sprayCanNeedsShakingParticle.GetComponent<ParticleSystemRenderer>().material = sprayPaintItem.particleMats[colorIndex];
+        
+                    // SprayPaintItemPatch.SetIndexColor(colorIndex);
+                    // sprayPaintItem.SprayPaintServerRpc(GameNetworkManager.Instance.localPlayerController.gameplayCamera.transform.position, GameNetworkManager.Instance.localPlayerController.gameplayCamera.transform.forward);
                 }
                 
             }
+        
         }
+        
     }
+    
 }
