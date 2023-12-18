@@ -16,7 +16,7 @@ namespace PaintColorSwitchMod {
         }
         
         [ServerRpc(RequireOwnership = false)]
-        public void EventServerRPC()
+        public void EventServerRpc()
         {
             Debug.Log("Client sent a server RPC... EventServerRPC Fired!");
             EventClientRpc();

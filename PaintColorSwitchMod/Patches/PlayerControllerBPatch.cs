@@ -21,7 +21,7 @@ namespace PaintColorSwitchMod.Patches
         
         [HarmonyPatch("Update")]
         [HarmonyPostfix]
-        private static void UpdatePaintColorPatch(PlayerControllerB __instance)
+        private static void BindColorChangeKeyPatch(PlayerControllerB __instance)
         {
             // Simple filter, but credit still goes to Ryokune (https://github.com/VisualError/LethalParrying) as I learned from looking at his code. Thanks!
             if ((__instance.IsOwner && __instance.isPlayerControlled && (!__instance.IsServer || __instance.isHostPlayerObject)) || __instance.isTestingPlayer)
@@ -36,12 +36,10 @@ namespace PaintColorSwitchMod.Patches
                 }
                 
                 if ((Keyboard.current.tKey).wasPressedThisFrame) {
-                    if (PaintColorSwitchNetworkHandler.Instance) {
-                        Debug.Log("EXISTS");
-                    } else {
-                        Debug.Log("DOESN'T EXISTS");
-                    }
-                    PaintColorSwitchNetworkHandler.Instance.EventServerRPC();
+                    Debug.Log("T Key was Pressed");
+
+                    PaintColorSwitchNetworkHandler.Instance.EventServerRpc();
+
                     // colorIndex = (int)fieldInfo.GetValue(sprayPaintItem);
                     //
                     // Debug.Log("Value retrieved in PlayerControllerB: " + colorIndex);

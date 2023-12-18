@@ -57,10 +57,10 @@ namespace PaintColorSwitchMod
                 Instance = this;
             }
             
-            harmony.PatchAll();
             harmony.PatchAll(typeof(PaintColorSwitchModBase));
+            harmony.PatchAll(typeof(NetworkObjectManager));
             harmony.PatchAll(typeof(PlayerControllerBPatch));
-            harmony.PatchAll(typeof(SprayPaintItemPatch));
+            // harmony.PatchAll(typeof(SprayPaintItemPatch));
             // harmony.PatchAll(typeof(GameNetworkManagerPatch));
         }
         
