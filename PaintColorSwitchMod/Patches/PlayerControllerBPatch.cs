@@ -37,9 +37,9 @@ namespace PaintColorSwitchMod.Patches
                 
                 if ((Keyboard.current.tKey).wasPressedThisFrame) {
                     Debug.Log("T Key was Pressed");
-
-                    PaintColorSwitchNetworkHandler.Instance.EventServerRpc();
-
+                    NetworkObjectReference sprayPaintItemNOR = sprayPaintItem.NetworkObject;
+                    PaintColorSwitchNetworkHandler.Instance.EventServerRpc(sprayPaintItemNOR);
+                    
                     // colorIndex = (int)fieldInfo.GetValue(sprayPaintItem);
                     //
                     // Debug.Log("Value retrieved in PlayerControllerB: " + colorIndex);
