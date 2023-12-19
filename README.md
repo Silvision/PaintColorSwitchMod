@@ -15,3 +15,5 @@ Purple -> Green -> Red -> Yellow
 
 ## Developer Notes
 This mod will work with other players that also have it downloaded. Pre-existing spray cans in the game before the mod was downloaded may have out of sync colors.
+
+The code itself is pretty messy and probably buggy, but it was more of a learning experience. Looking to refine it if I get enough downloads, but it should be enough for now.
