@@ -16,8 +16,6 @@ namespace PaintColorSwitchMod.Patches
         private static GrabbableObject currentItem;
         private static SprayPaintItem sprayPaintItem = null;
         
-        // private static FieldInfo fieldInfo = AccessTools.Field(typeof(SprayPaintItem), "sprayCanMatsIndex");
-        // private static int colorIndex;
         
         [HarmonyPatch("Update")]
         [HarmonyPostfix]
@@ -28,33 +26,26 @@ namespace PaintColorSwitchMod.Patches
             {
                 currentItem = __instance.ItemSlots[__instance.currentItemSlot];
                 if (currentItem == null) {
-                    return;     
+                    return;         
                 }   
                 sprayPaintItem = (currentItem is SprayPaintItem) ? currentItem as SprayPaintItem : null;
                 if (sprayPaintItem == null) {
                     return; 
                 }
+
+                if (!sprayPaintItem.NetworkObject) return;
+                NetworkObjectReference sprayPaintItemNOR = sprayPaintItem.NetworkObject;
                 
                 if ((Keyboard.current.tKey).wasPressedThisFrame) {
                     Debug.Log("T Key was Pressed");
-                    NetworkObjectReference sprayPaintItemNOR = sprayPaintItem.NetworkObject;
-                    PaintColorSwitchNetworkHandler.Instance.EventServerRpc(sprayPaintItemNOR);
-                    
-                    // colorIndex = (int)fieldInfo.GetValue(sprayPaintItem);
-                    //
-                    // Debug.Log("Value retrieved in PlayerControllerB: " + colorIndex);
-                    // if ( colorIndex < sprayPaintItem.sprayCanMats.Length - 1) {
-                    //     colorIndex++;
-                    // } else {
-                    //     colorIndex = 0;
-                    // }
-                    // Debug.Log("Color set from PlayerControllerB: " + colorIndex);
-                    // fieldInfo.SetValue(sprayPaintItem, colorIndex);
-                    // sprayPaintItem.sprayParticle.GetComponent<ParticleSystemRenderer>().material = sprayPaintItem.particleMats[colorIndex];
-                    // sprayPaintItem.sprayCanNeedsShakingParticle.GetComponent<ParticleSystemRenderer>().material = sprayPaintItem.particleMats[colorIndex];
-        
-                    // SprayPaintItemPatch.SetIndexColor(colorIndex);
-                    // sprayPaintItem.SprayPaintServerRpc(GameNetworkManager.Instance.localPlayerController.gameplayCamera.transform.position, GameNetworkManager.Instance.localPlayerController.gameplayCamera.transform.forward);
+                    if (__instance.IsHost || __instance.IsServer) {
+                        Debug.Log("Does it get here x1");
+                        PaintColorSwitchNetworkHandler.Instance.EventClientRpc(sprayPaintItemNOR);
+                    } else {
+                        Debug.Log("Does it get here x2");
+                        PaintColorSwitchNetworkHandler.Instance.EventServerRpc(sprayPaintItemNOR);
+                    }
+
                 }
                 
             }
